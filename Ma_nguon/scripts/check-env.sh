@@ -2,6 +2,7 @@
 set -u
 root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)" || exit 2
 fail=0
+
 check_tool() {
   if command -v "$1" >/dev/null 2>&1; then
     printf 'OK tool %s\n' "$1"
@@ -10,7 +11,9 @@ check_tool() {
     fail=$((fail + 1))
   fi
 }
+
 for tool in php git; do check_tool "$tool"; done
+
 for file in README.md public/index.php; do
   if [[ -f "$root/$file" ]]; then
     printf 'OK file %s\n' "$file"
@@ -19,7 +22,9 @@ for file in README.md public/index.php; do
     fail=$((fail + 1))
   fi
 done
+
 if [[ "$fail" -gt 0 ]]; then exit 2; fi
+
 if php -l "$root/public/index.php"; then
   echo 'CHECK_ENV=PASS'
 else
