@@ -211,6 +211,17 @@ try {
     $update_count = $conn->prepare("UPDATE shares SET download_count = download_count + 1 WHERE id = ?");
     $update_count->execute([$share['id']]);
 
+    // Ghi nhận lịch sử tải xuống vào bảng download_logs
+    $ip_address = $_SERVER['REMOTE_ADDR'] ?? 'UNKNOWN';
+    $user_agent = $_SERVER['HTTP_USER_AGENT'] ?? 'UNKNOWN';
+    $log_status = 'success';
+
+    $stmt_log = $conn->prepare("
+        INSERT INTO download_logs (share_id, ip_address, user_agent, status) 
+        VALUES (?, ?, ?, ?)
+    ");
+    $stmt_log->execute([$share['id'], $ip_address, $user_agent, $log_status]);
+
     // Xác nhận hoàn tất giao dịch an toàn
     $conn->commit();
 } catch (Exception $e) {

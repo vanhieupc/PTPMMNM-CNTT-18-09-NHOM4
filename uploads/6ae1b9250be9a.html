@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        .container{
+            width: 90%;
+            margin: 10px auto;
+        }
+        .container h2{
+            text-transform: uppercase;
+            padding: 10px 0;
+        }
+        table{
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td{
+            border: 1px solid #ddd;
+        }
+        th{
+            background-color: #f4f4f4;
+        }
+        button{
+            background-color: #f44338;
+            color: #f4f4f4;
+            border: 1px solid #f44338;
+            border-radius: 5px;
+            padding: 5px 8px;
+            cursor: pointer;
+        }
+        button:hover{
+            background-color: #d31234;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Danh sach bai viet</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Body</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="body">
+                <!-- Du lieu lay ve tu api se chen vao day -->
+            </tbody>
+        </table>
+    </div>
+    <script>
+        const url = 'https://jsonplaceholder.typicode.com/posts';
+        //su dung fetch de lay du lieu tu api
+        fetch(url)
+            .then(response=>{
+                if(!response.ok){
+                    throw new Error('Error: '+response.statusText);
+                }
+                return response.json();//chuyen du lieu ve json
+            })
+            .then(data=>{
+                data.forEach(post => {
+                    //tao phan tu tr
+                    let row = document.createElement("tr");
+                    //them noi dung cho tr
+                    row.innerHTML = `
+                        <td>${post.id}</td>
+                        <td>${post.title}</td>
+                        <td>${post.body}</td>
+                        <td><button class="btn-delete">Delete</button></td>
+                    `;
+                    //them tr vao tbody
+                    document.getElementById("body").appendChild(row);
+
+                    //xu ly su kien khi nguoi dung bam nut delete
+                    row.querySelector(".btn-delete").addEventListener('click',()=>{
+                        if(confirm('Ban co chac chan muon xoa ${post.id}?')){
+                            fetch(`${url}/${post.id}`,{method: 'DELETE'})
+                            .then(response=>{
+                                if(!response.ok){
+                                    throw new Error("Khong the xoa!");
+                                }
+                                document.getElementById("body").removeChild(row);
+                            })
+                            .catch(error=>{
+                                console.log("Loi khi lay du lieu tu API",error);
+                            })
+                        }
+                    })
+                });
+            })
+            .catch(error =>{
+                console.log("Loi khi lay du lieu tu API",error);
+            })
+    </script>
+</body>
+</html>
